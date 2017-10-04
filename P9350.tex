@@ -1,0 +1,129 @@
+% This is the ADASS_template.tex LaTeX file, 26th August 2016.
+% It is based on the ASP general author template file, but modified to reflect the specific
+% requirements of the ADASS proceedings.
+% Copyright 2014, Astronomical Society of the Pacific Conference Series
+% Revision:  14 August 2014
+
+% To compile, at the command line positioned at this folder, type:
+% latex ADASS_template
+% latex ADASS_template
+% dvipdfm ADASS_template
+% This will create a file called aspauthor.pdf.}
+
+\documentclass[11pt,twoside]{article}
+
+% Do NOT use ANY packages other than asp2014.
+\usepackage{asp2014}
+
+\aspSuppressVolSlug
+\resetcounters
+
+% References must all use BibTeX entries in a .bibfile.
+% References must be cited in the text using \citet{} or \citep{}.
+% Do not use \cite{}.
+% See ManuscriptInstructions.pdf for more details
+\bibliographystyle{asp2014}
+
+% The ``markboth'' line sets up the running heads for the paper.
+% 1 author: "Surname"
+% 2 authors: "Surname1 and Surname2"
+% 3 authors: "Surname1, Surname2, and Surname3"
+% >3 authors: "Surname1 et al."
+% Replace ``Short Title'' with the actual paper title, shortened if necessary.
+% Use mixed case type for the shortened title
+% Ensure shortened title does not cause an overfull hbox LaTeX error
+% See ASPmanual2010.pdf 2.1.4  and ManuscriptInstructions.pdf for more details
+\markboth{Jenness}{Python 3 at LSST}
+
+\begin{document}
+
+\title{Python 3 at the Large Synoptic Survey Telescope}
+
+% Note the position of the comma between the author name and the
+% affiliation number.
+% Author names should be separated by commas.
+% The final author should be preceded by "and".
+% Affiliations should not be repeated across multiple \affil commands. If several
+% authors share an affiliation this should be in a single \affil which can then
+% be referenced for several author names.
+% See ManuscriptInstructions.pdf and ASPmanual2010.pdf 3.1.4 for more details
+\author{Tim~Jenness$^1$
+\affil{$^1$Large Synoptic Survey Telescope, Tucson, AZ, USA; \email{tjenness@lsst.org}}}
+
+% This section is for ADS Processing.  There must be one line per author.
+\paperauthor{Tim~Jenness}{tjenness@lsst.org}{0000-0001-5982-167X}{LSST}{Data Management}{Tucson}{AZ}{85719}{USA}
+
+\begin{abstract}
+  The LSST software systems make extensive use of Python, with almost all of it initially being developed solely in Python 2.
+  Since LSST will be commissioned when Python 2 is end-of-lifed it is critical that we have all our code support Python 3 before commissioning begins.
+  Over the past year we have made significant progress in migrating the bulk of the code from the Data Management system onto Python 3.
+  This poster presents our migration methodology, and the current status of the port, with our eventual aim to be running completely on Python 3 by early 2018.
+\end{abstract}
+
+\section{Python 3 Porting}
+
+We recommend using the Python \verb|future| package\footnote{\url{http://python-future.org}} to port Python 2 software to Python 3 and to aid development when supporting both Python versions.
+We chose \verb|future| because it is designed to make compatible code look like it is written for Python 3 natively and minimizes explicit checks for Python version.
+The \verb|futurize| command worked really well and support for the two stage conversion was important.
+Stage 1 modernizes code to use Python 2.7 constructs such as modern exception catching, checking if a key is in a dict using \verb|in| rather than \verb|has_key|, and use of \verb|__future__| for print function.
+Stage 2 does more extensive rewrites to support Python 3 changes to builtins and the standard library.
+It also replaces \verb|map(filter(lambda())| constructs with more readable list comprehensions.
+We found that using the Unicode \verb|str| object added more complication than was desired so we have left string objects as their native type in many places.
+Proper handling of bytes and strings is the biggest headache when switching Python versions.
+The LSST baseline Python 3 is version 3.6.
+
+\section{LSST Python Software}
+
+Python is used widely at LSST. They key software is:
+\begin{itemize}
+\item Science Pipelines.
+\item VO and Data Access Services.
+\item Simulations software \citep{2014SPIE.9150E..14C}.
+\item LSST Scheduler \citep{2016SPIE.9910E..13D}.
+\item Wavefront Sensor data processing \citep{2016SPIE.9906E..3BT}.
+\end{itemize}
+The biggest user of Python is in Data Management \citep[DM;][]{O3-1_adassxxv} and the bulk of this software was ported to Python 3 in the second half of 2016.
+DM are regularly running Python 3 now for science pipelines, data access services and the Qserv database administration scripts.
+DM currently use some DESDM infrastructure at NCSA; those will be fixed by early 2018.
+The ``sims'' software has been ported to Python 3 and has no remaining issues.
+The Scheduler software has had an initial modernization pass to support Python 3 but has not yet been tested.
+The Scheduler uses the Software Abstraction Layer \citep[SAL;][]{2016SPIE.9906E..5CM} message system (based on DDS) \citep{2016SPIE.9911E..25R} and the Python 3 bindings were not available until October 2017.
+We expect the Scheduler to be running with Python 3 by the end of the 2017.
+The wavefront sensor processing software uses DM software and will be running Python 3 when it is completed.
+
+\section{Other Changes}
+
+
+In addition to supporting Python 3, we have made two major improvements to the Python infrastructure for DM and Simulations:
+\begin{itemize}
+\item We have replaced our SWIG bindings \citep{beazley2003automated} with \texttt{pybind11}\footnote{\url{http://pybind11.readthedocs.io}}.
+      \texttt{pybind11} requires that the interface be defined manually, but does result in a cleaner separation of C++, interface, and Python code.
+\item We have adopted \texttt{pytest}\footnote{\url{https://pytest.org/}} as a our test execution framework.
+      This has significantly enhanced the reporting of test metrics in Jenkins CI, and plugin support has allowed us to add automated \texttt{flake8} testing, parallel execution with \texttt{xdist}, and code coverage.
+\end{itemize}
+
+\section{Dropping Python 2}
+
+We have been supporting Python 3 and Python 2 in the Data Management software since Summer 2016, and this has given our user community time to become accustomed to Python 3.
+There is though a cost to supporting Python 2, with extra Continuous Integration resources, source code distractions with constructs that are not needed in Python 3, and developers having to understand that they cannot use Python 3 features and either running with two local installations or discovering late that their working code fails on Python 2.
+To simplify our development roadmap and give clarity to the community, LSST DM will drop support for Python 2 following the release of v15.0 of the DM  Pipelines Stack in Spring 2018.
+We will support critical bug fixes to v15.0 until the release of v16.0 in late 2018. This timeline is consistent with the release of Astropy v3.0; their first release without Python 2 support.
+
+\section{DM Pipelines v14.0}
+
+Version 14.0 of the DM Science Pipelines Stack was released in October 2017.
+This is the first release using pybind11.
+This release also begins to use the Starlink AST library \citep{2016A&C....15...33B} for WCS handling.
+Full release notes can be found at: \url{https://pipelines.lsst.io/releases/notes.html}.
+
+\section{Summary}
+
+LSST will be using Python 3.6 internally starting in 2018.
+This includes data challenges, and integration and testing activities.
+The Data Management software will drop support for Python 2 following the release of v15.0 in Spring 2018.
+
+\acknowledgements This material is based upon work supported in part by the National Science Foundation through Cooperative Agreement 1258333 managed by the Association of Universities for Research in Astronomy (AURA), and the Department of Energy under Contract No. DE-AC02-76SF00515 with the SLAC National Accelerator Laboratory. Additional LSST funding comes from private donations, grants to universities, and in-kind support from LSSTC Institutional Members.
+
+\bibliography{P9350}  % For BibTex
+
+\end{document}
