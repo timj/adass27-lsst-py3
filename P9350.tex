@@ -60,6 +60,14 @@
   This poster presents our migration methodology, and the current status of the port, with our eventual aim to be running completely on Python 3 by early 2018.
 \end{abstract}
 
+\section{Introduction}
+
+Python 3.0 was released in December 2008, just after the release of Python 2.6, with Python 2.7 first being released in July 2010.
+The development of the Data Management software for the Large Synoptic Survey Telescope began in 2004 \citep{2004AAS...20510811A}, around the time Python 2.4 was released, and was exclusively using Python 2.7 until work on supporting Python 3 began in 2016 \citep{P6-12_adassxxvi}.
+At LSST we use many packages that have pledged to drop support for Python 2 no later than 2020\footnote{\url{http://www.python3statement.org}} including Astropy \citep{2013A&A...558A..33A}, pandas, matplotlib, and Jupyter.
+Many of those packages are dropping Python 2 in the near term and are pledging to do minimal support of Python 2 in their Long Term Support releases.
+The combination of no new features in these package from 2018 with the commissioning time line for LSST, implies that we should switch to Python 3 sooner rather than later; switching just before, or even during, commissioning starts would cause major complications.
+
 \section{Python 3 Porting}
 
 We recommend using the Python \verb|future| package\footnote{\url{http://python-future.org}} to port Python 2 software to Python 3 and to aid development when supporting both Python versions.
@@ -74,7 +82,7 @@ The LSST baseline Python 3 is version 3.6.
 
 \section{LSST Python Software}
 
-Python is used widely at LSST. They key software is:
+Python is used widely at LSST. The key software is:
 \begin{itemize}
 \item Science Pipelines.
 \item VO and Data Access Services.
@@ -98,7 +106,7 @@ In addition to supporting Python 3, we have made two major improvements to the P
 \begin{itemize}
 \item We have replaced our SWIG bindings \citep{beazley2003automated} with \texttt{pybind11}\footnote{\url{http://pybind11.readthedocs.io}}.
       \texttt{pybind11} requires that the interface be defined manually, but does result in a cleaner separation of C++, interface, and Python code.
-\item We have adopted \texttt{pytest}\footnote{\url{https://pytest.org/}} as a our test execution framework.
+\item We have adopted \texttt{pytest}\footnote{\url{https://pytest.org/}} as our test execution framework.
       This has significantly enhanced the reporting of test metrics in Jenkins CI, and plugin support has allowed us to add automated \texttt{flake8} testing, parallel execution with \texttt{xdist}, and code coverage.
 \end{itemize}
 
@@ -107,11 +115,11 @@ In addition to supporting Python 3, we have made two major improvements to the P
 We have been supporting Python 3 and Python 2 in the Data Management software since Summer 2016, and this has given our user community time to become accustomed to Python 3.
 There is though a cost to supporting Python 2, with extra Continuous Integration resources, source code distractions with constructs that are not needed in Python 3, and developers having to understand that they cannot use Python 3 features and either running with two local installations or discovering late that their working code fails on Python 2.
 To simplify our development roadmap and give clarity to the community, LSST DM will drop support for Python 2 following the release of v15.0 of the DM  Pipelines Stack in Spring 2018.
-We will support critical bug fixes to v15.0 until the release of v16.0 in late 2018. This timeline is consistent with the release of Astropy v3.0; their first release without Python 2 support.
+We will support critical bug fixes to v15.0 until the release of v16.0 in late 2018. This timeline is consistent with the release of Astropy v3.0; their first release without Python 2 support \citep{APE10}.
 
 \section{DM Pipelines v14.0}
 
-Version 14.0 of the DM Science Pipelines Stack was released in October 2017.
+Version 14.0 of the DM Science Pipelines Stack was released in October 2017.\footnote{See \citet{P056_adassxxv} for an overview of version 11.0.}
 This is the first release using pybind11.
 This release also begins to use the Starlink AST library \citep{2016A&C....15...33B} for WCS handling.
 Full release notes can be found at: \url{https://pipelines.lsst.io/releases/notes.html}.
