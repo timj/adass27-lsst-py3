@@ -80,7 +80,7 @@ We found that using the Unicode \verb|str| object provided by \verb|future| to e
 When supporting 2 and 3 in a single codebase, there are times when the code has to include Python 2 types such as \texttt{basestring} and \texttt{long} to allow the Python 2 code to work correctly even though in Python 3 these types are meaningless.
 \verb|future| provides the \texttt{past.builtins} package to support this, although using it is a hint to the future that the code will have to be modified when Python 2 support is dropped.
 Proper handling of bytes and strings is the biggest headache when switching Python versions, since Python 2 is much more relaxed about string encodings and code that works fine on Python 2 can blow up in surprising ways on Python 3.
-
+\citet{SQR-014} provides a more detailed description of the migration process.
 The LSST baseline Python 3 is version 3.6.
 
 \section{LSST Python Software}
@@ -95,7 +95,7 @@ Python is used widely at LSST with the key software being:
 \end{itemize}
 The biggest user of Python is in Data Management \citep[DM;][]{O3-1_adassxxv} and the bulk of this software was ported to Python 3 in the second half of 2016.
 DM are regularly running Python 3 now for science pipelines, data access services and the Qserv database administration scripts.
-DM currently use some DESDM infrastructure at NCSA; those will be fixed by early 2018.
+DM currently use some DESDM infrastructure at NCSA \citep{2012SPIE.8451E..0DM}; those will be updated to work with Python 3 by early 2018.
 The ``sims'' software has been ported to Python 3 and has no remaining issues.
 The Scheduler software has had an initial modernization pass to support Python 3 but has not yet been tested.
 The Scheduler uses the Software Abstraction Layer \citep[SAL;][]{2016SPIE.9906E..5CM} message system (based on DDS) \citep{2016SPIE.9911E..25R} and the Python 3 bindings were not available until October 2017.
