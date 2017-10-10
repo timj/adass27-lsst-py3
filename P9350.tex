@@ -73,7 +73,7 @@ The combination of no new features in these package from 2018 with the commissio
 We used the Python \verb|future| package\footnote{\url{http://python-future.org}} to port Python 2 software to Python 3 and to aid development when supporting both Python versions.
 We chose \verb|future| because it is designed to make compatible code look like it is written for Python 3 natively and minimizes explicit checks for Python version.
 The \verb|futurize| command worked really well and support for the two stage conversion was important.
-Stage 1 modernizes code to use Python 2.7 constructs such as modern exception catching, checking if a key is in a dict using \verb|in| rather than \verb|has_key|, and use of \verb|__future__| for print function.
+Stage 1 modernizes code to use Python 2.7 constructs such as modern exception catching, checking if a key is in a \texttt{dict} using \verb|in| rather than \verb|has_key|, and use of \verb|__future__| for print function.
 Stage 2 does more extensive rewrites to support Python 3 changes to builtins and the standard library.
 It also replaces \verb|map(filter(lambda())| constructs with more readable list comprehensions.
 We found that using the Unicode \verb|str| object provided by \verb|future| to emulate the Python 3 \verb|str| in Python 2 added more complication than was desired so we have left string objects as their native type in many places.
