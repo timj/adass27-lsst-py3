@@ -104,13 +104,25 @@ The wavefront sensor processing software uses DM software and will be running Py
 
 \section{Data Management and Simulations Software}
 
-In addition to supporting Python 3, we have made two major improvements to the Python infrastructure for DM and Simulations:
-\begin{itemize}
-\item We have replaced our SWIG bindings \citep{beazley2003automated} with \texttt{pybind11}\footnote{\url{http://pybind11.readthedocs.io}}.
-      \texttt{pybind11} requires that the interface be defined manually, but does result in a cleaner separation of C++, interface, and Python code.
-\item We have adopted \texttt{pytest}\footnote{\url{https://pytest.org/}} as our test execution framework.
-      This has significantly enhanced the reporting of test metrics in Jenkins CI, and plugin support has allowed us to add automated \texttt{flake8} testing, parallel execution with \texttt{xdist}, and code coverage.
-\end{itemize}
+In addition to supporting Python 3, we have made two major improvements to the Python infrastructure for DM and Simulations.
+We have replaced our SWIG bindings \citep{beazley2003automated} with \texttt{pybind11}\footnote{\url{http://pybind11.readthedocs.io}}, and we have migrated our test execution environment to use \texttt{pytest}\footnote{\url{https://pytest.org/}}.
+
+\texttt{pybind11} provides a native C++ mechanism for building Python interfaces.
+Unlike SWIG, these interfaces are not constructed automatically and have to be constructed manually.
+The promise of automated interface building was never really fulfilled and we previously had extensive SWIG customizations to make it work with our codebase and the interfaces were not "Pythonic", with substantial Python interface code hidden in SWIG files.
+In some packages we now have less interface code and in others we have a little more, but the new interfaces have a clear definition that is understandable and maintainable.
+In particular keyword arguments are now significantly easier to deal with.
+
+Previously, for our unit tests, \texttt{scons} would run each test script with the Python interpreter and look for the exit status of the script.
+This worked, but the execution framework had almost no visibility into the tests themselves.
+In particular there was no way to determine how many tests ran or how many were skipped, and there were no metrics reported on the execution times of individual tests.
+We now use \texttt{pytest} to run the tests and write the test output into a file compatible with JUnit so that our Jenkins CI system can display the results in a standard way.
+We make use of a number of plugins including \texttt{pytest-xdist} to run the tests in parallel, and \texttt{pytest-flake8} to run the \texttt{flake8} linter on the source code.
+The \texttt{pytest-cov} plugin is being investigated to enable coverage reports from the unit tests.
+One difference between the old and new approaches is that \texttt{pytest} runs all the tests in a shared environment either in a single process or a small number of parallel subprocesses.
+This did require that some tests were modified to ensure that global state was rest at the end of each test, and some tests did have to be modified to ensure that the random number seed was in a fixed state at set up.
+One complication with \texttt{xdist} is that we had to be careful with file system temporary storage since tests from the same test class can be scheduled on different processes, leading to races if fixed output files or directories are used.
+Some tests had to be refactored to use temporary output files or directories to prevent races.
 
 Version 14.0 of the DM Science Pipelines Stack was released in October 2017.\footnote{See \citet{P056_adassxxv} for an overview of version 11.0.}
 This is the first release using pybind11.
